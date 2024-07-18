@@ -3,6 +3,7 @@
 @section('title', 'Accueil du  site')
 @section('content')
 
+
     <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
@@ -38,6 +39,8 @@
         </div>
     </section>
 
+    <h1>Artisans dans le secteur : {{ $sector }}</h1>
+
     <div class="row">
 
         @foreach ($artisans as $artisan)
@@ -57,8 +60,7 @@
     @endforeach
     </div>
 
+@endsection
 
-   
-<a href="{{ route('artisanss.create') }}" class="btn btn-primary">Ajouter un Artisan </a>
- @endsection
 
+ 

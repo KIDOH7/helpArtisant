@@ -7,6 +7,7 @@ use App\Models\Artisan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Auth;
 
 class ArtisanControllers extends Controller
@@ -146,4 +147,97 @@ class ArtisanControllers extends Controller
 
         return redirect()->route('artisanss.index')->with('success', 'Artisan supprimé avec succès.');
     }
+
+
+    // rechercher les artisans 
+
+
+public function showSearchForm()
+{
+    $sectors = [
+        'Couture', 'Menuiserie', 'Coiffure', 'Plomberie', 'Electricité', 'Sculpture', 'Poterie',
+        'Maçonnerie', 'Peinture','Artisanat d\'art', 'Jardinage', 'Informatique', 'Tissage', 'Agriculture',
+        'Restauration', 'Transport', 'Nettoyage' , 'cordonnier', 'Coiffure et soins de beauté', 'Autre'
+    ];
+
+    $cities = Artisan::select('ville')->distinct()->get()->pluck('ville');
+    $communes = [
+        'Abobo', 'Adjamé', 'Attécoubé', 'Cocody', 'Koumassi', 'Marcory',
+        'Plateau', 'Port-Bouët', 'Treichville', 'Yopougon', 'songon' , 
+    ];
+
+    return view('artisanss.search', compact('sectors', 'cities', 'communes'));
+}
+
+public function autocompleteSectors(Request $request)
+{
+    $term = $request->input('term');
+
+    $sectors = [
+        'Couture', 'Menuiserie', 'Coiffure', 'Plomberie', 'Electricité', 'Sculpture', 'Poterie',
+        'Maçonnerie', 'Peinture','Artisanat d\'art', 'Jardinage', 'Informatique', 'Tissage', 'Agriculture',
+        'Restauration', 'Transport', 'Nettoyage' , 'cordonnier ', 'Coiffure et soins de beauté', 'Autre'
+    ];
+
+    // Filtrer les secteurs en fonction du terme entré par l'utilisateur
+    $filteredSectors = array_filter($sectors, function ($sector) use ($term) {
+        return stripos($sector, $term) !== false;
+    });
+
+    return response()->json($filteredSectors);
+}
+
+public function search(Request $request)
+{
+    $query = Artisan::query();
+
+    if ($request->filled('secteur_activite')) {
+        $query->where('secteur_activite', 'like', '%' . $request->input('secteur_activite') . '%');
+    }
+
+    if ($request->filled('ville')) {
+        $query->where('ville', 'like', '%' . $request->input('ville') . '%');
+
+        if (strtolower($request->input('ville')) == 'abidjan' && $request->filled('commune')) {
+            $query->where('commune', 'like', '%' . $request->input('commune') . '%');
+        }
+    }
+
+    if ($request->filled('quartier')) {
+        $query->where('quartier', 'like', '%' . $request->input('quartier') . '%');
+    }
+
+    $artisans = $query->get();
+
+    $secondarySearch = false;
+    if ($artisans->isEmpty() && $request->filled('city') && $request->filled('sector')) {
+        $secondaryQuery = Artisan::query();
+
+        $secondaryQuery->where('ville', 'like', '%' . $request->input('ville') . '%')
+                       ->where('secteur_activite', 'like', '%' . $request->input('secteur_activite') . '%');
+
+        $artisans = $secondaryQuery->get();
+
+        if ($artisans->isNotEmpty()) {
+            $secondarySearch = true;
+        }
+    }
+
+    return view('artisanss.search_results', ['artisans' => $artisans]);
+}
+
+
+public function welcome()
+{
+    $sectors = Artisan::select('secteur_activite')->distinct()->pluck('secteur_activite');
+    return view('welcome', ['sectors' => $sectors]);
+}
+
+public function showArtisansBySector($sector)
+{
+    $artisans = Artisan::where('secteur_activite', $sector)->get();
+    return view('artisanss.artisans_by_sector', compact('artisans', 'sector'));
+}
+
+
 }
