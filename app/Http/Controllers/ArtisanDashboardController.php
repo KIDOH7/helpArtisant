@@ -11,6 +11,6 @@ class ArtisanDashboardController extends Controller
     {
         $artisan = Auth::guard('artisan')->user();
 
-        return view('artisan.dashboard', compact('artisan'));
+        return view('artisanss.dashboard', compact('artisan'));
     }
 }

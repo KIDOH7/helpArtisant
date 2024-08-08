@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title')chuis ôthaentik</title>
+    <title>@yield('title')</title>
     <link rel="icon" href="https://img.freepik.com/photos-gratuite/cruche-inachevee_1098-13687.jpg?uid=R99967860&ga=GA1.1.1477675911.1719911554&semt=ais_user" type="">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marko One&display=swap">
@@ -12,7 +12,6 @@
     <style>
  
             body {
-                body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
@@ -225,6 +224,9 @@ footer .text-center p {
 </head>
 <body>
     <header class="navbar navbar-expand-lg navbar-light bg-light">
+            <!-- <a href="/">
+                <img src="{{ asset('images/my-logo.jpg') }}" alt="My Logo" class="w-20 h-20 fill-current text-gray-500">
+            </a> -->
         <a class="navbar-brand" href="#" style="color: #d63384;">Help'Artisanat</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -234,21 +236,47 @@ footer .text-center p {
                 <li class="nav-item">
                     <a class="nav-link active" href="{{ route('welcome') }}">Accueil</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="html/QSN.html">Qui sommes nous</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('artisanss.create') }}">S'enregistrer en tant qu'artisans</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="html/contact.html">Contact</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('artisanss.search') }}">Rechercher un artisans</a>
                 </li>
             </ul>
-            <a href="html/connexion.html"><button class="btn btn-primary mr-2" type="button">S'inscrire</button></a>
-            <a href="html/pack.html"><button class="btn btn-outline-primary" type="button">S'identifier</button></a>
+            @if (Route::has('login'))
+                                @auth
+                                    <a
+                                        href="{{ url('/dashboard') }}"
+                                        class="btn btn-outline-primary rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                    >
+                                        {{ Auth::user()->name }}
+                                    </a>
+                                @else
+                                    <a
+                                        href="{{ route('login') }}"
+                                        class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                    >
+                                    <a href="{{ route('login') }}">
+                                        <button class="btn btn-outline-primary" type="button">S'identifier</button>
+                                    </a>
+
+                                    @if (Route::has('register'))
+                                        <a
+                                            href="{{ route('register') }}"
+                                            class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                        >
+                                        <a href="{{ route('register') }}">
+                                            <button class="btn btn-primary mr-2" type="button">S'inscrire</button>
+                                        </a>
+                                    @endif
+                                @endauth
+                                @endif
         </div>
     </header>
     <div class="container">

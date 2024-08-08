@@ -55,7 +55,7 @@ class ArtisanControllers extends Controller
                 ->withInput();
         }
 
-        Artisan::create([
+        $artisan = Artisan::create([
             'nom' => $request->nom,
             'sexe' => $request->sexe,
             'ville' => $request->ville,
@@ -76,10 +76,19 @@ class ArtisanControllers extends Controller
             // 'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Artisan créé avec succès.');
+        return redirect()->route('artisanss.dashboard_view', str_replace(' ', '-', $artisan->nom))->with('success', 'Artisan créé avec succès.');
+    }
+
+    public function dashboard($name)
+    {
+        $name = str_replace('-', ' ', $name);
+        $artisan = Artisan::where('nom', $name)->firstOrFail();
+
+        return view('artisanss.dashboard_view.index', compact('artisan'));
     }
 
 
+//  a moi d'administrateur du site ces ma parti 
     public function show($id)
     {
         $artisan = Artisan::find($id);
@@ -94,7 +103,7 @@ class ArtisanControllers extends Controller
     public function edit($id)
     {
         $artisan = Artisan::findOrFail($id);
-        return view('artisanss.edit', compact('artisan'));
+        return view('artisanss.dashboard_view.form_modif', compact('artisan'));
     }
 
     // Mettre à jour les informations d'un artisan
@@ -118,34 +127,38 @@ class ArtisanControllers extends Controller
             'certif' => ['required', 'string', 'max:255'],
             'zone_couverture' => ['required', 'string', 'max:255'],
             'annee_existence' => ['required', 'integer'],
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
         ]);
-
         if ($validator->fails()) {
-            return redirect()->route('artisanss.edit', $artisan->id)
+            return redirect()->route('artisanss.dashboard_view.form_modif', $artisan->id)
                         ->withErrors($validator)
                         ->withInput();
         }
-
+    
+        
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $artisan->image = $imageName;
+        }
+        
         $artisan->update($request->all());
+        $artisan->save();
 
-        return redirect()->route('dashboard')->with('success', 'Informations modifiées avec succès.');
+
+        return redirect()->route('artisanss.dashboard_view',$artisan->id)->with('success', 'Informations modifiées avec succès.');
     }
 
-    public function destroys(Artisan $artisan)
-    {
-        $artisan->delete();
 
-        return redirect()->route('artisanss.index')->with('success', 'Artisan supprimé avec succès.');
-    }
 
     public function destroy($id)
     {
         $artisan = Artisan::findOrFail($id);
         $artisan->delete();
 
-        return redirect()->route('artisanss.index')->with('success', 'Artisan supprimé avec succès.');
+        return redirect()->route('artisanss.creat')->with('success', 'Artisan supprimé avec succès.');
     }
 
 

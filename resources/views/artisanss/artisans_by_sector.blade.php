@@ -1,6 +1,6 @@
 @extends('base')
 
-@section('title', 'Accueil du  site')
+@section('title', 'Artisans par categorie')
 @section('content')
 
 
